@@ -6,16 +6,16 @@ import java.util.Random;
 
 public class TriangleEvolution extends Evolution {
 
-    Random random = new Random(); // TODO: add seed?
+    Random random = new Random();
 
-    private static int iterations = 10; // TODO
-    private static int populationSize = 5;
-    private static int triangleCount = 5; // TODO: to 50
-    private static int childCount = 5;
-    private static int maxNew = 5;
-    private static int maxChanges = 20;
-    private static double colorChangeProb = 0.5;
-    private static int displayFreq = 1; // TODO
+    private static int iterations = 100_000;
+    private static int populationSize = 1;
+    private static int triangleCount = 50;
+    private static int childCount = 1;
+    private static int maxNew = 0;
+    private static int maxChanges = 3;
+    private static double colorChangeProb = 0.3;
+    private static int displayFreq = 100;
 
     private List<TriangleImage> population;
 
@@ -27,7 +27,7 @@ public class TriangleEvolution extends Evolution {
         initializePopulation();
         for (int i = 0; i < iterations; i++) {
             nextGeneration();
-            if (i % displayFreq == 0) {
+            if ((i+1) % displayFreq == 0) {
                 displayTop(i + 1);
             }
         }
@@ -52,7 +52,7 @@ public class TriangleEvolution extends Evolution {
 
     private void mutate(TriangleImage triangleImage) {
         List<Triangle> triangles = triangleImage.getTriangles();
-        int nNew = random.nextInt(maxNew);
+        int nNew = random.nextInt(maxNew + 1);
         for (int i = 0; i < nNew; i++) {
             triangles.remove(random.nextInt(triangles.size()));
             triangles.add(randomTriangle());
@@ -77,7 +77,7 @@ public class TriangleEvolution extends Evolution {
     }
 
     private void initializePopulation() {
-        population = new ArrayList<>(25); // TODO: change
+        population = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
             List<Triangle> triangles = new ArrayList<>(triangleCount);
             for (int j = 0; j < triangleCount; j++) {

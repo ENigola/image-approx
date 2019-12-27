@@ -23,6 +23,7 @@ public class GUI {
     private JLabel createdLabel;
     private JLabel createdImageLabel;
 
+    private Thread evolutionThread;
 
     public GUI() {
         frame = new JFrame("Evolutionary Image Approximation");
@@ -84,12 +85,20 @@ public class GUI {
         BufferedImage image = getCurrentImage();
         String algorithmName = (String) representationSelect.getSelectedItem();
         assert algorithmName != null;
+        if (evolutionThread != null && evolutionThread.isAlive()) {
+            return;
+        }
+        Runnable runnable;
         if (algorithmName.equals("Triangles")) {
             TriangleEvolution evolution = new TriangleEvolution(image, this);
-            evolution.evolve();
+            runnable = evolution::evolve;
         } else if (algorithmName.equals("Voronoi")) {
             throw new NotImplementedException();
+        } else {
+            runnable = null;
         }
+        evolutionThread = new Thread(runnable);
+        evolutionThread.start();
     }
 
     private void showOriginalImage(String filename) {
