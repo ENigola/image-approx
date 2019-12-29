@@ -2,6 +2,7 @@ package main.triangle;
 
 import main.Evolution;
 import main.GUI;
+import main.ImageRepresentation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,12 +11,15 @@ import java.util.List;
 
 public class TriangleEvolution extends Evolution {
 
+    // TODO: something broken (population/instances changes when loss worse)
+
     private static int populationSize = 1;
     private static int triangleCount = 50;
     private static int childCount = 1;
     private static int maxNew = 0;
     private static int maxChanges = 3;
     private static double colorChangeProb = 0.3;
+    private static int maxColorChange = 50;
 
     private List<TriangleImage> population;
 
@@ -23,6 +27,10 @@ public class TriangleEvolution extends Evolution {
         super(originalImage, gui, generations, maxNoChangeGenerations, displayFreq);
     }
 
+    @Override
+    protected int getCurrentLoss() {
+        return ImageRepresentation.absoluteDifference(originalImage, chooseFittest(1, population).get(0).toImage());
+    }
 
     @Override
     protected void displayTop() {
@@ -59,8 +67,7 @@ public class TriangleEvolution extends Evolution {
     private void mutateTriangle(Triangle triangle) {
         double p = random.nextDouble();
         if (p < colorChangeProb) {
-            triangle.setColor(new Color(random.nextInt(256), random.nextInt(256),
-                    random.nextInt(256), random.nextInt(256)));
+            triangle.setColor(mutateColor(triangle.getColor(), maxColorChange, true, true));
         } else {
             int pos = random.nextInt(3);
             triangle.getX()[pos] = random.nextInt(originalImage.getWidth());

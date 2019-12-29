@@ -1,7 +1,9 @@
 package main;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 public abstract class Evolution {
 
@@ -13,8 +15,9 @@ public abstract class Evolution {
     private Integer maxNoChangeGenerations;
     private int displayFreq;
 
-    protected double currentLoss;
-    private int noChangeGenerations;
+    protected int currentLoss;
+    private int noChangeGenerations = 0;
+    protected int generation = 1;
 
     public Evolution(BufferedImage originalImage, GUI gui, Integer maxGenerations, Integer maxNoChangeGenerations, int displayFreq) {
         this.random = new Random();
@@ -30,16 +33,16 @@ public abstract class Evolution {
 
     public void evolve() {
         initializePopulation();
-        int generation = 1;
+        currentLoss = getCurrentLoss();
         while (true) {
             if (maxGenerations != null && generation > maxGenerations) {
-                generation--;
                 break;
             }
-            double oldLoss = currentLoss;
+            int oldLoss = currentLoss;
             nextGeneration();
             if (generation % displayFreq == 0) {
                 gui.setGeneration(generation);
+                System.out.println("" + currentLoss + " " + noChangeGenerations); // TODO: delete
                 displayTop();
             }
             if (currentLoss == oldLoss) {
@@ -48,7 +51,11 @@ public abstract class Evolution {
                 noChangeGenerations = 0;
             }
             if (maxNoChangeGenerations != null && noChangeGenerations > maxNoChangeGenerations) {
-                gui.setInfoText("No improvement for " + noChangeGenerations + " generations");
+                gui.setInfoText("No improvement for " + noChangeGenerations + " generations.");
+                break;
+            }
+            if (currentLoss == 0) {
+                gui.setInfoText("Loss 0 reached at generation " + generation + ".");
                 break;
             }
             generation++;
@@ -56,6 +63,8 @@ public abstract class Evolution {
         gui.setGeneration(generation);
         displayTop();
     }
+
+    protected abstract int getCurrentLoss();
 
     protected abstract void displayTop();
 
@@ -73,5 +82,36 @@ public abstract class Evolution {
         }
         images.sort(Comparator.comparingInt(imageToLoss::get));
         return images.subList(0, n);
+    }
+
+    protected Color mutateColor(Color color, int maxColorChange, boolean mutateAlpha, boolean mutateAll) {
+        int[] colorArray;
+        if (mutateAlpha) {
+            colorArray = new int[] {color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()};
+        } else {
+            colorArray = new int[] {color.getRed(), color.getGreen(), color.getBlue()};
+        }
+        if (mutateAll) {
+            for (int i = 0; i < colorArray.length; i++) {
+                colorArray[i] = bound(colorArray[i] + doubleRand(maxColorChange), 0, 255);
+            }
+        } else {
+            int pos = random.nextInt(colorArray.length);
+            colorArray[pos] = bound(colorArray[pos] + doubleRand(maxColorChange), 0, 255);
+        }
+        if (mutateAlpha) {
+            return new Color(colorArray[0], colorArray[1], colorArray[2], colorArray[3]);
+        } else {
+            return new Color(colorArray[0], colorArray[1], colorArray[2]);
+        }
+    }
+
+    protected int doubleRand(int n) {
+        return random.nextInt(2 * n) - n;
+    }
+
+    protected int bound(int n, int min, int max) {
+        n = Math.max(n, min);
+        return Math.min(Math.max(n, min), max);
     }
 }

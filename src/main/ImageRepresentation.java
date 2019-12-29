@@ -1,6 +1,10 @@
 package main;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 public abstract class ImageRepresentation implements Cloneable {
 
@@ -36,5 +40,25 @@ public abstract class ImageRepresentation implements Cloneable {
             }
         }
         return diff;
+    }
+
+    private static String imageOutput = "output/";
+
+    public void save() {
+        Date now = new Date();
+        File outFile = new File(imageOutput + "output_" + now.getHours() + "_" + now.getMinutes() + "_" + now.getSeconds() + ".png");
+        try {
+            ImageIO.write(this.toImage(), "png", outFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -34,12 +34,7 @@ public class TriangleImage extends ImageRepresentation implements Cloneable {
     }
 
     public TriangleImage clone() {
-        TriangleImage clone;
-        try {
-            clone = (TriangleImage) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        TriangleImage clone = (TriangleImage) super.clone();
         List<Triangle> trianglesCopy = new ArrayList<>(triangles.size());
         for (Triangle triangle : triangles) {
             trianglesCopy.add(triangle.clone());
