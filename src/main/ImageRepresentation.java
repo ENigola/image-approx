@@ -1,3 +1,5 @@
+package main;
+
 import java.awt.image.BufferedImage;
 
 public abstract class ImageRepresentation implements Cloneable {
@@ -27,9 +29,9 @@ public abstract class ImageRepresentation implements Cloneable {
             for (int y = 0; y < img1.getHeight(); y++) {
                 int rgb1 = img1.getRGB(x, y);
                 int rgb2 = img2.getRGB(x, y);
-                int pixelDiff = ((rgb1 & 0xff) - (rgb2 & 0xff))
-                        + ((rgb1 & 0xff00) - (rgb2 & 0xff00))
-                        + ((rgb1 & 0xff0000) - (rgb2 & 0xff0000));
+                int pixelDiff = Math.abs((rgb1 & 0xff) - (rgb2 & 0xff)) // blue
+                        + Math.abs(((rgb1 & 0xff00) - (rgb2 & 0xff00)) >> 8) // green
+                        + Math.abs(((rgb1 & 0xff0000) - (rgb2 & 0xff0000)) >> 16); // red
                 diff += pixelDiff;
             }
         }

@@ -1,44 +1,36 @@
+package main.triangle;
+
+import main.Evolution;
+import main.GUI;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class TriangleEvolution extends Evolution {
 
-    Random random = new Random();
-
-    private static int iterations = 100_000;
     private static int populationSize = 1;
     private static int triangleCount = 50;
     private static int childCount = 1;
     private static int maxNew = 0;
     private static int maxChanges = 3;
     private static double colorChangeProb = 0.3;
-    private static int displayFreq = 100;
 
     private List<TriangleImage> population;
 
-    public TriangleEvolution(BufferedImage originalImage, GUI gui) {
-        super(originalImage, gui);
+    public TriangleEvolution(BufferedImage originalImage, GUI gui, int generations, int maxNoChangeGenerations, int displayFreq) {
+        super(originalImage, gui, generations, maxNoChangeGenerations, displayFreq);
     }
 
-    public void evolve() {
-        initializePopulation();
-        for (int i = 0; i < iterations; i++) {
-            nextGeneration();
-            if ((i+1) % displayFreq == 0) {
-                displayTop(i + 1);
-            }
-        }
-    }
 
-    private void displayTop(int generation) {
+    @Override
+    protected void displayTop() {
         TriangleImage top = chooseFittest(1, population).get(0);
-        gui.setCreatedImage(top.toImage(), generation);
+        gui.setCreatedImage(top.toImage());
     }
 
-    private void nextGeneration() {
+    protected void nextGeneration() {
         List<TriangleImage> newInstances = new ArrayList<>(population);
         for (TriangleImage parent : population) {
             for (int i = 0; i < childCount; i++) {
@@ -76,7 +68,8 @@ public class TriangleEvolution extends Evolution {
         }
     }
 
-    private void initializePopulation() {
+    @Override
+    protected void initializePopulation() {
         population = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
             List<Triangle> triangles = new ArrayList<>(triangleCount);

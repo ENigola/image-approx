@@ -1,3 +1,5 @@
+package main.triangle;
+
 import java.awt.*;
 
 public class Triangle implements Cloneable {

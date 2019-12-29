@@ -1,3 +1,7 @@
+package main.triangle;
+
+import main.ImageRepresentation;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

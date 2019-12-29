@@ -1,10 +1,11 @@
+package main;
+
+import main.triangle.SimpleTriangleEvolution;
+import main.triangle.TriangleEvolution;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class GUI {
     private JComboBox<String > imageSelect;
     private JButton runButtion;
 
+    private JLabel infoLabel;
     private JLabel originalLabel;
     private JLabel originalImageLabel;
     private JLabel createdLabel;
@@ -34,6 +36,9 @@ public class GUI {
         imageSelect = createImageSelect();
         runButtion = createRunButtion();
 
+        infoLabel = new JLabel();
+        infoLabel.setBounds(10, 40, 400, 20);
+
         originalLabel = new JLabel("Original", SwingConstants.CENTER);
         originalImageLabel = new JLabel();
 
@@ -43,6 +48,7 @@ public class GUI {
         frame.add(representationSelect);
         frame.add(imageSelect);
         frame.add(runButtion);
+        frame.add(infoLabel);
         frame.add(originalLabel);
         frame.add(originalImageLabel);
         frame.add(createdLabel);
@@ -54,8 +60,31 @@ public class GUI {
         showOriginalImage((String) imageSelect.getSelectedItem());
     }
 
+    private void runEvolution() {
+        BufferedImage image = getCurrentImage();
+        String algorithmName = (String) representationSelect.getSelectedItem();
+        assert algorithmName != null;
+        if (evolutionThread != null && evolutionThread.isAlive()) {
+            return;
+        }
+        Runnable runnable;
+        if (algorithmName.equals("Simple Triangles")) {
+            SimpleTriangleEvolution evolution = new SimpleTriangleEvolution(image, this, null, 10_000, 100);
+            runnable = evolution::evolve;
+        } else if (algorithmName.equals("Triangles")) {
+            TriangleEvolution evolution = new TriangleEvolution(image, this, 100_000, 10_000, 10);
+            runnable = evolution::evolve;
+        } else if (algorithmName.equals("Voronoi")) {
+            throw new NotImplementedException();
+        } else {
+            runnable = null;
+        }
+        evolutionThread = new Thread(runnable);
+        evolutionThread.start();
+    }
+
     private JComboBox<String> createRepresentationSelect() {
-        String[] representations = {"Triangles", "Voronoi"};
+        String[] representations = {"Simple Triangles", "Triangles", "Voronoi"};
         JComboBox<String> representationSelect = new JComboBox<>(representations);
         representationSelect.setBounds(10, 10, 140, 20);
         return  representationSelect;
@@ -81,24 +110,8 @@ public class GUI {
         return runButton;
     }
 
-    private void runEvolution() {
-        BufferedImage image = getCurrentImage();
-        String algorithmName = (String) representationSelect.getSelectedItem();
-        assert algorithmName != null;
-        if (evolutionThread != null && evolutionThread.isAlive()) {
-            return;
-        }
-        Runnable runnable;
-        if (algorithmName.equals("Triangles")) {
-            TriangleEvolution evolution = new TriangleEvolution(image, this);
-            runnable = evolution::evolve;
-        } else if (algorithmName.equals("Voronoi")) {
-            throw new NotImplementedException();
-        } else {
-            runnable = null;
-        }
-        evolutionThread = new Thread(runnable);
-        evolutionThread.start();
+    public void setInfoText(String info) {
+        infoLabel.setText(info);
     }
 
     private void showOriginalImage(String filename) {
@@ -108,8 +121,8 @@ public class GUI {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        originalLabel.setBounds(10, 40, image.getWidth(), 20);
-        originalImageLabel.setBounds(10, 70, image.getWidth(), image.getHeight());
+        originalLabel.setBounds(10, 70, image.getWidth(), 20);
+        originalImageLabel.setBounds(10, 100, image.getWidth(), image.getHeight());
         originalImageLabel.setIcon(new ImageIcon(image));
     }
 
@@ -118,10 +131,13 @@ public class GUI {
         return (BufferedImage) imageIcon.getImage();
     }
 
-    public void setCreatedImage(BufferedImage createdImage, int generation) {
+    public void setGeneration(int generation) {
         createdLabel.setText("Generation " + generation);
-        createdLabel.setBounds(20 + originalImageLabel.getWidth(), 40, createdImage.getWidth(), 20);
-        createdImageLabel.setBounds(20 + originalImageLabel.getWidth(), 70,
+        createdLabel.setBounds(20 + originalImageLabel.getWidth(), 70, originalImageLabel.getWidth(), 20);
+    }
+
+    public void setCreatedImage(BufferedImage createdImage) {
+        createdImageLabel.setBounds(20 + originalImageLabel.getWidth(), 100,
                 createdImage.getWidth(), createdImage.getHeight());
         createdImageLabel.setIcon(new ImageIcon(createdImage));
     }
