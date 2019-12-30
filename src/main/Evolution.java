@@ -36,6 +36,7 @@ public abstract class Evolution {
         currentLoss = getCurrentLoss();
         while (true) {
             if (maxGenerations != null && generation > maxGenerations) {
+                gui.setInfoText("" + maxGenerations + " generations finished.");
                 break;
             }
             int oldLoss = currentLoss;

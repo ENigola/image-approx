@@ -3,6 +3,7 @@ package main;
 import main.line.LineEvolution;
 import main.triangle.SimpleTriangleEvolution;
 import main.triangle.TriangleEvolution;
+import main.voronoi.VoronoiEvolution;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 public class GUI {
 
+    public static String  imageOutputPath = "output/";
     private static String imagesPath = "resources/images/";
 
     private JFrame frame;
@@ -62,7 +64,7 @@ public class GUI {
     }
 
     private JComboBox<String> createRepresentationSelect() {
-        String[] representations = {"Line", "Simple Triangles", "Triangles", "Voronoi"}; // TODO: fix order
+        String[] representations = {"Voronoi", "Line", "Simple Triangles", "Triangles"}; // TODO: fix order
         JComboBox<String> representationSelect = new JComboBox<>(representations);
         representationSelect.setBounds(10, 10, 140, 20);
         return  representationSelect;
@@ -110,8 +112,8 @@ public class GUI {
     }
 
     public void setGeneration(int generation) {
-        createdLabel.setText("Generation " + generation);
-        createdLabel.setBounds(20 + originalImageLabel.getWidth(), 70, originalImageLabel.getWidth(), 20);
+        createdLabel.setText(String.format("Generation %,d", generation));
+        createdLabel.setBounds(20 + originalImageLabel.getWidth(), 70, Math.max(originalImageLabel.getWidth(), 120), 20);
     }
 
     public void setCreatedImage(BufferedImage createdImage) {
@@ -133,7 +135,7 @@ public class GUI {
         } else if (algorithmName.equals("Triangles")) {
             evolution = new TriangleEvolution(image, this, 100_000, 10_000, 10);
         } else if (algorithmName.equals("Voronoi")) {
-            throw new NotImplementedException();
+            evolution = new VoronoiEvolution(image, this, 1_000_000, 10_000, 10);
         } else if (algorithmName.equals("Line")) {
             evolution = new LineEvolution(image, this, 1_000_000, 1_000_000, 10);
         } else {

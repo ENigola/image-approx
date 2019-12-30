@@ -51,10 +51,8 @@ public class SimpleTriangleEvolution extends BinaryEvolution<TriangleImage> {
 
     private void mutateVertex(Triangle triangle) {
         int pos = random.nextInt(3);
-        int xChange = doubleRand(maxMoveX);
-        int yChange = doubleRand(maxMoveY);
-        triangle.getX()[pos] = bound(triangle.getX()[pos] + xChange, 0, originalImage.getWidth());
-        triangle.getY()[pos] = bound(triangle.getY()[pos] + yChange, 0, originalImage.getHeight());
+        triangle.getX()[pos] = bound(triangle.getX()[pos] + doubleRand(maxMoveX), 0, originalImage.getWidth());
+        triangle.getY()[pos] = bound(triangle.getY()[pos] + doubleRand(maxMoveY), 0, originalImage.getHeight());
     }
 
     private Triangle randomTriangle() {
