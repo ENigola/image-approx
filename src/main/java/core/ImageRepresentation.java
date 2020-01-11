@@ -1,11 +1,10 @@
-package main;
+package core;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public abstract class ImageRepresentation implements Cloneable {
 

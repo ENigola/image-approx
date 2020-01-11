@@ -1,9 +1,8 @@
-package main.line;
+package line;
 
-import main.BinaryEvolution;
-import main.Evolution;
-import main.GUI;
-import main.ImageRepresentation;
+import core.BinaryEvolution;
+import core.GUI;
+import line.LineImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

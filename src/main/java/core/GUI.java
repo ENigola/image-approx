@@ -1,10 +1,10 @@
-package main;
+package core;
 
-import main.line.LineEvolution;
-import main.triangle.SimpleTriangleEvolution;
-import main.triangle.TriangleEvolution;
-import main.voronoi.VoronoiEvolution;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ellipse.EllipseEvolution;
+import line.LineEvolution;
+import triangle.SimpleTriangleEvolution;
+import triangle.TriangleEvolution;
+import voronoi.VoronoiEvolution;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,12 +15,13 @@ import java.io.IOException;
 public class GUI {
 
     public static String  imageOutputPath = "output/";
-    private static String imagesPath = "resources/images/";
+    private static String imagesPath = "images/";
 
     private JFrame frame;
     private JComboBox<String> representationSelect;
     private JComboBox<String > imageSelect;
-    private JButton runButtion;
+    private JButton runButton;
+    private JButton stopButton;
 
     private JLabel infoLabel;
     private JLabel originalLabel;
@@ -29,6 +30,7 @@ public class GUI {
     private JLabel createdImageLabel;
 
     private Thread evolutionThread;
+    private Evolution currentEvolution;
 
     public GUI() {
         frame = new JFrame("Evolutionary Image Approximation");
@@ -37,7 +39,8 @@ public class GUI {
 
         representationSelect = createRepresentationSelect();
         imageSelect = createImageSelect();
-        runButtion = createRunButtion();
+        runButton = createRunButton();
+        stopButton = createStopButton();
 
         infoLabel = new JLabel();
         infoLabel.setBounds(10, 40, 400, 20);
@@ -50,7 +53,8 @@ public class GUI {
 
         frame.add(representationSelect);
         frame.add(imageSelect);
-        frame.add(runButtion);
+        frame.add(runButton);
+        frame.add(stopButton);
         frame.add(infoLabel);
         frame.add(originalLabel);
         frame.add(originalImageLabel);
@@ -64,7 +68,7 @@ public class GUI {
     }
 
     private JComboBox<String> createRepresentationSelect() {
-        String[] representations = {"Voronoi", "Line", "Simple Triangles", "Triangles"}; // TODO: fix order
+        String[] representations = {"Ellipse", "Voronoi", "Line", "Simple Triangles", "Triangles"}; // TODO: fix order
         JComboBox<String> representationSelect = new JComboBox<>(representations);
         representationSelect.setBounds(10, 10, 140, 20);
         return  representationSelect;
@@ -83,11 +87,22 @@ public class GUI {
         return imageSelect;
     }
 
-    private JButton createRunButtion() {
+    private JButton createRunButton() {
         JButton runButton = new JButton("Run");
         runButton.setBounds(310, 10, 60, 20);
         runButton.addActionListener(event -> runEvolution());
         return runButton;
+    }
+
+    private JButton createStopButton() {
+        JButton stopButton = new JButton("Stop");
+        stopButton.setBounds(380, 10, 60, 20);
+        stopButton.addActionListener(event -> {
+            if (currentEvolution != null) {
+                currentEvolution.running = false;
+            }
+        });
+        return stopButton;
     }
 
     public void setInfoText(String info) {
@@ -127,7 +142,7 @@ public class GUI {
         String algorithmName = (String) representationSelect.getSelectedItem();
         assert algorithmName != null;
         if (evolutionThread != null && evolutionThread.isAlive()) {
-            return;
+            currentEvolution.running = false;
         }
         Evolution evolution;
         if (algorithmName.equals("Simple Triangles")) {
@@ -135,13 +150,16 @@ public class GUI {
         } else if (algorithmName.equals("Triangles")) {
             evolution = new TriangleEvolution(image, this, 100_000, 10_000, 10);
         } else if (algorithmName.equals("Voronoi")) {
-            evolution = new VoronoiEvolution(image, this, 1_000_000, 10_000, 10);
+            evolution = new VoronoiEvolution(image, this, 1_000_000, 10_000, 100);
         } else if (algorithmName.equals("Line")) {
             evolution = new LineEvolution(image, this, 1_000_000, 1_000_000, 10);
+        } else if (algorithmName.equals("Ellipse")) {
+            evolution = new EllipseEvolution(image, this, 1_000_000, 10_000, 30);
         } else {
             return;
         }
         Runnable runnable = evolution::evolve;
+        currentEvolution = evolution;
         evolutionThread = new Thread(runnable);
         evolutionThread.start();
     }

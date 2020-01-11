@@ -1,4 +1,4 @@
-package main;
+package core;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,9 +18,10 @@ public abstract class Evolution {
     protected int currentLoss;
     private int noChangeGenerations = 0;
     protected int generation = 1;
+    public boolean running = true;
 
     public Evolution(BufferedImage originalImage, GUI gui, Integer maxGenerations, Integer maxNoChangeGenerations, int displayFreq) {
-        this.random = new Random();
+        this.random = new Random(0); // TODO: UNSEED
         this.originalImage = originalImage;
         this.gui = gui;
         this.maxGenerations = maxGenerations;
@@ -34,7 +35,7 @@ public abstract class Evolution {
     public void evolve() {
         initializePopulation();
         currentLoss = getCurrentLoss();
-        while (true) {
+        while (running) {
             if (maxGenerations != null && generation > maxGenerations) {
                 gui.setInfoText("" + maxGenerations + " generations finished.");
                 break;
@@ -45,6 +46,12 @@ public abstract class Evolution {
                 gui.setGeneration(generation);
                 System.out.println("" + currentLoss + " " + noChangeGenerations); // TODO: delete
                 displayTop();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    System.out.println(e);
+                    System.exit(-789);
+                }
             }
             if (currentLoss == oldLoss) {
                 noChangeGenerations++;
@@ -61,6 +68,7 @@ public abstract class Evolution {
             }
             generation++;
         }
+        System.out.println("fin!!!");
         gui.setGeneration(generation);
         displayTop();
     }

@@ -1,9 +1,7 @@
-package main.triangle;
+package triangle;
 
-import main.BinaryEvolution;
-import main.Evolution;
-import main.GUI;
-import main.ImageRepresentation;
+import core.BinaryEvolution;
+import core.GUI;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

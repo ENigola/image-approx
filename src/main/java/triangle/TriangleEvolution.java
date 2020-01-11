@@ -1,8 +1,8 @@
-package main.triangle;
+package triangle;
 
-import main.Evolution;
-import main.GUI;
-import main.ImageRepresentation;
+import core.Evolution;
+import core.GUI;
+import core.ImageRepresentation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

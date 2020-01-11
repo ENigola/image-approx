@@ -1,4 +1,4 @@
-package main.voronoi;
+package voronoi;
 
 import java.awt.*;
 
@@ -24,6 +24,15 @@ public class ColorPoint {
 
     public Color getColor() {
         return color;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof ColorPoint)) {
+            return false;
+        }
+        ColorPoint otherColorPoint = (ColorPoint) other;
+        return otherColorPoint.x == x && otherColorPoint.y == y && otherColorPoint.color.equals(color);
     }
 
 }

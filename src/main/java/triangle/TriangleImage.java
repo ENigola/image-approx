@@ -1,6 +1,6 @@
-package main.triangle;
+package triangle;
 
-import main.ImageRepresentation;
+import core.ImageRepresentation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

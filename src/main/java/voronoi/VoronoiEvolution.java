@@ -1,14 +1,14 @@
-package main.voronoi;
+package voronoi;
 
-import main.BinaryEvolution;
-import main.GUI;
+import core.BinaryEvolution;
+import core.GUI;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class VoronoiEvolution extends BinaryEvolution<VoronoiImage> {
 
-    private static int pointCount = 100;
+    private static int pointCount = 300;
     private static double colorChangeProb = 0.5;
     private static int maxChanges = 1;
     private static int maxColorChange = 50;

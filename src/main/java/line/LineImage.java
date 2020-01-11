@@ -1,13 +1,9 @@
-package main.line;
+package line;
 
-import main.ImageRepresentation;
-import main.triangle.Triangle;
-import main.triangle.TriangleImage;
+import core.ImageRepresentation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LineImage extends ImageRepresentation {
 
