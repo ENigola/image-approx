@@ -10,10 +10,10 @@ public class Ellipse implements Cloneable {
     public int y;
     public int width;
     public int height;
-    public double angle;
+    public int angle;
     public Color color;
 
-    public Ellipse(int x, int y, int width, int height, double angle, Color color) {
+    public Ellipse(int x, int y, int width, int height, int angle, Color color) {
         this.x = x;
         this.y = y;
         this.width = width;

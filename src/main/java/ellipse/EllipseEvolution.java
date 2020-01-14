@@ -2,24 +2,24 @@ package ellipse;
 
 import core.BinaryEvolution;
 import core.GUI;
-import core.ImageRepresentation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class EllipseEvolution extends BinaryEvolution<EllipseImage> {
 
     private static int ellipseCount = 100;
-    private static int maxChanges = 3;
-    private static int maxColorChange = 50;
-    private static double maxMoveRatio = 0.3;
+    private static int maxChanges = 2;
+    private static int maxColorChange = 30;
+    private static double maxMoveRatio = 0.2;
+    private static int maxAngleChange = 170;
 
     private static double colorChangeProb = 0.3;
     private static double widthHeightChangeProb = 0.3;
+    private static double angleChangeProb = 0.3;
+    private static double locationChangeProb = 0.3;
 
     private int maxMoveX;
     private int maxMoveY;
@@ -42,7 +42,7 @@ public class EllipseEvolution extends BinaryEvolution<EllipseImage> {
                     new Color(random.nextInt(256),
                             random.nextInt(256),
                             random.nextInt(256),
-                            random.nextInt(256)));
+                            random.nextInt(226) + 30));
             ellipses.add(ellipse);
         }
         current = new EllipseImage(originalImage.getWidth(), originalImage.getHeight(), ellipses);
@@ -53,14 +53,17 @@ public class EllipseEvolution extends BinaryEvolution<EllipseImage> {
         int nChanges = random.nextInt(maxChanges) + 1;
         for (int i = 0; i < nChanges; i++) {
             Ellipse ellipse = image.getEllipses().get(random.nextInt(image.getEllipses().size()));
-            double p = random.nextDouble();
-            if (p < colorChangeProb) {
-                Color newColor = mutateColor(ellipse.color, maxColorChange, true, true);
-                ellipse.color = newColor;
-            } else if (p < colorChangeProb + widthHeightChangeProb) {
+            if (random.nextDouble() < colorChangeProb) {
+                ellipse.color = mutateColor(ellipse.color, maxColorChange, true, false);
+            }
+            if (random.nextDouble() < widthHeightChangeProb) {
                 ellipse.width = bound(ellipse.width + doubleRand(maxMoveX), 0, originalImage.getWidth());
                 ellipse.height = bound(ellipse.height + doubleRand(maxMoveY), 0, originalImage.getHeight());
-            } else {
+            }
+            if (random.nextDouble() < angleChangeProb) {
+                ellipse.angle = bound(ellipse.angle + doubleRand(maxAngleChange), 0, 359);
+            }
+            if (random.nextDouble() < locationChangeProb) {
                 ellipse.x = bound(ellipse.x + doubleRand(maxMoveX), 0, originalImage.getWidth());
                 ellipse.y = bound(ellipse.y + doubleRand(maxMoveY), 0, originalImage.getHeight());
             }

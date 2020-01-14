@@ -2,8 +2,8 @@ package core;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public abstract class Evolution {
 
@@ -21,21 +21,22 @@ public abstract class Evolution {
     public boolean running = true;
 
     public Evolution(BufferedImage originalImage, GUI gui, Integer maxGenerations, Integer maxNoChangeGenerations, int displayFreq) {
-        this.random = new Random(0); // TODO: UNSEED
+        this.random = new Random();
         this.originalImage = originalImage;
         this.gui = gui;
         this.maxGenerations = maxGenerations;
         this.maxNoChangeGenerations = maxNoChangeGenerations;
         this.displayFreq = displayFreq;
-        if (maxGenerations == null && maxNoChangeGenerations == null) {
-            throw new RuntimeException("maxGenerations and maxNoChangeGenerations can't both be null");
-        }
     }
 
     public void evolve() {
         initializePopulation();
         currentLoss = getCurrentLoss();
         while (running) {
+            checkSleep();
+            if (saveCondition(generation)) {
+                getTop().save(generation);
+            }
             if (maxGenerations != null && generation > maxGenerations) {
                 gui.setInfoText("" + maxGenerations + " generations finished.");
                 break;
@@ -44,7 +45,8 @@ public abstract class Evolution {
             nextGeneration();
             if (generation % displayFreq == 0) {
                 gui.setGeneration(generation);
-                System.out.println("" + currentLoss + " " + noChangeGenerations); // TODO: delete
+                // debug print
+                System.out.println(String.format("Current loss: %d, no improvement generations: %d", currentLoss, noChangeGenerations));
                 displayTop();
                 try {
                     Thread.sleep(100);
@@ -68,14 +70,47 @@ public abstract class Evolution {
             }
             generation++;
         }
-        System.out.println("fin!!!");
         gui.setGeneration(generation);
         displayTop();
     }
 
+    private static int sleepAfter = 3000;
+    private static int sleepFor = 1000;
+    private long lastSleep = System.currentTimeMillis();
+
+    private void checkSleep() {
+        if (System.currentTimeMillis() - lastSleep > sleepAfter) {
+            try {
+                Thread.sleep(sleepFor);
+                lastSleep = System.currentTimeMillis();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    // non-100k save points
+    private static List<Integer> saveGenerations = Arrays.asList(
+            1,
+            1_000,
+            3_000,
+            10_000,
+            30_000,
+            50_000,
+            70_000
+    );
+
+    protected boolean saveCondition(int generation) {
+        return generation % 100_000 == 0 || saveGenerations.contains(generation);
+    }
+
     protected abstract int getCurrentLoss();
 
-    protected abstract void displayTop();
+    private void displayTop() {
+        gui.setCreatedImage(getTop().toImage());
+    }
+
+    protected abstract ImageRepresentation getTop();
 
     protected abstract void initializePopulation();
 
@@ -109,7 +144,7 @@ public abstract class Evolution {
             colorArray[pos] = bound(colorArray[pos] + doubleRand(maxColorChange), 0, 255);
         }
         if (mutateAlpha) {
-            return new Color(colorArray[0], colorArray[1], colorArray[2], colorArray[3]);
+            return new Color(colorArray[0], colorArray[1], colorArray[2], colorArray[3]); // Math.max(colorArray[3], 30)
         } else {
             return new Color(colorArray[0], colorArray[1], colorArray[2]);
         }

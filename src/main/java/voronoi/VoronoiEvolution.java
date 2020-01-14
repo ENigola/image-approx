@@ -9,11 +9,12 @@ import java.awt.image.BufferedImage;
 public class VoronoiEvolution extends BinaryEvolution<VoronoiImage> {
 
     private static int pointCount = 300;
-    private static double colorChangeProb = 0.5;
     private static int maxChanges = 1;
-    private static int maxColorChange = 50;
-    private static boolean mutateAllColors = true;
-    private static double maxMoveRatio = 0.1;
+    private static int maxColorChange = 30;
+    private static boolean mutateAllColors = false;
+    private static double maxMoveRatio = 0.05;
+    private static double colorChangeProb = 0.3;
+    private static double locationChangeProb = 0.3;
 
     private int maxMoveX;
     private int maxMoveY;
@@ -41,13 +42,17 @@ public class VoronoiEvolution extends BinaryEvolution<VoronoiImage> {
         for (int i = 0; i < nChanges; i++) {
             int pos = random.nextInt(image.getPoints().size());
             ColorPoint oldPoint = image.getPoints().get(pos);
-            ColorPoint newPoint;
-            if (random.nextDouble() < colorChangeProb) {
+            ColorPoint newPoint = null;
+            boolean changeColor = random.nextDouble() < colorChangeProb;
+            boolean changeLocation = !changeColor || random.nextDouble() < locationChangeProb;
+            if (changeColor) {
                 Color newColor = mutateColor(oldPoint.getColor(), maxColorChange, false, mutateAllColors);
                 newPoint = new ColorPoint(oldPoint.getX(), oldPoint.getY(), newColor);
-            } else {
-                int newX = bound(oldPoint.getX() + doubleRand(maxMoveX), 0, originalImage.getWidth());
-                int newY = bound(oldPoint.getY() + doubleRand(maxMoveY), 0, originalImage.getHeight());
+            }
+            if (changeLocation) {
+                int extra = random.nextDouble() < 0.1 ? (originalImage.getWidth() + originalImage.getHeight()) / 4 : 0;
+                int newX = bound(oldPoint.getX() + doubleRand(maxMoveX + extra), 0, originalImage.getWidth());
+                int newY = bound(oldPoint.getY() + doubleRand(maxMoveY + extra), 0, originalImage.getHeight());
                 newPoint = new ColorPoint(newX, newY, oldPoint.getColor());
             }
             image.getPoints().set(pos, newPoint);

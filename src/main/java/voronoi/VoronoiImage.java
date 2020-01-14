@@ -1,6 +1,5 @@
 package voronoi;
 
-import com.sun.org.apache.bcel.internal.generic.DREM;
 import core.ImageRepresentation;
 import de.alsclo.voronoi.Voronoi;
 import de.alsclo.voronoi.graph.Edge;
@@ -9,14 +8,15 @@ import de.alsclo.voronoi.graph.Point;
 import de.alsclo.voronoi.graph.Vertex;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class VoronoiImage extends ImageRepresentation {
 
-    List<ColorPoint> points;
+    private List<ColorPoint> points;
 
     public VoronoiImage(int width, int height) {
         super(width, height);
@@ -29,9 +29,6 @@ public class VoronoiImage extends ImageRepresentation {
 
     @Override
     public BufferedImage toImage() {
-        //if (true) { // TODO: do something about this
-        //    return toImageNaive();
-        //}
         Collection<Point> voronoiPoints = new ArrayList<>(points.size() + 4);
         for (ColorPoint colorPoint : points) {
             voronoiPoints.add(new Point(colorPoint.getX(), colorPoint.getY()));
@@ -49,6 +46,8 @@ public class VoronoiImage extends ImageRepresentation {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
+        graphics.setColor(disallowed);
+        graphics.fillRect(0, 0, width, height);
         for (ColorPoint colorPoint : points) {
             graphics.setColor(colorPoint.getColor());
             Point current = new Point(colorPoint.getX(), colorPoint.getY());
@@ -59,18 +58,14 @@ public class VoronoiImage extends ImageRepresentation {
             }
             int[][] xy = consecutivePoints(edges); /// TODO: PROBLEM
             graphics.fillPolygon(xy[0], xy[1], xy[0].length);
-            // ------------ // TODO: remove
-            //graphics.setColor(Color.BLACK);
-            //int radius = 3;
-            //graphics.fill(new Ellipse2D.Double(colorPoint.getX() - radius, colorPoint.getY() - radius, 2*radius, 2*radius));
-            // ----------
         }
         return image;
     }
 
     // empties the input list
     private int[][] consecutivePoints(List<Edge> edges) {
-        // remove edges of length 0
+        // remove null edges and edges of length 0
+        List<Edge> edgesCopy = new ArrayList<>(edges);
         List<Edge> toRemove = new ArrayList<>();
         for (Edge edge : edges) {
             if (edge.getA() == null) {

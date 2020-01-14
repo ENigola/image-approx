@@ -11,8 +11,8 @@ public abstract class BinaryEvolution<T extends ImageRepresentation> extends Evo
     }
 
     @Override
-    protected void displayTop() {
-        gui.setCreatedImage(current.toImage());
+    protected ImageRepresentation getTop() {
+        return current;
     }
 
     @Override
@@ -24,7 +24,12 @@ public abstract class BinaryEvolution<T extends ImageRepresentation> extends Evo
     protected void nextGeneration() {
         T newImage = (T) current.clone();
         mutate(newImage);
-        int newLoss = ImageRepresentation.absoluteDifference(originalImage, newImage.toImage());
+        int newLoss;
+        try {
+            newLoss = ImageRepresentation.absoluteDifference(originalImage, newImage.toImage());
+        } catch (IllegalStateException | NullPointerException e) {
+            newLoss = Integer.MAX_VALUE;
+        }
         if (newLoss < currentLoss) {
             currentLoss = newLoss;
             current = newImage;

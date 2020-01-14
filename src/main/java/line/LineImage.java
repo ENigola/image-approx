@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 
 public class LineImage extends ImageRepresentation {
 
-    private static int rgbMask = 0x00ffffff; // for excluding alpha value TODO: is it necessary?
     private static Color initialColor = Color.BLACK;
 
     // order: left to right

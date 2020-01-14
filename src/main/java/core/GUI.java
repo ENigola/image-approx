@@ -67,8 +67,36 @@ public class GUI {
         showOriginalImage((String) imageSelect.getSelectedItem());
     }
 
+    private void runEvolution() {
+        BufferedImage image = getCurrentImage();
+        String algorithmName = (String) representationSelect.getSelectedItem();
+        assert algorithmName != null;
+        if (evolutionThread != null && evolutionThread.isAlive()) {
+            currentEvolution.running = false;
+        }
+        Evolution evolution;
+        if (algorithmName.equals("Triangles")) {
+            evolution = new SimpleTriangleEvolution(image, this, null, 10_000, 100);
+        } else if (algorithmName.equals("Triangles (complex)")) {
+            evolution = new TriangleEvolution(image, this, 1_000_000, 10_000, 100);
+        } else if (algorithmName.equals("Voronoi")) {
+            evolution = new VoronoiEvolution(image, this, null, 10_000, 100);
+        } else if (algorithmName.equals("Line")) {
+            evolution = new LineEvolution(image, this, 1_000_000, 1_000_000, 100);
+        } else if (algorithmName.equals("Ellipses")) {
+            evolution = new EllipseEvolution(image, this, null, 10_000, 100);
+        } else {
+            return;
+        }
+        Runnable runnable = evolution::evolve;
+        currentEvolution = evolution;
+        evolutionThread = new Thread(runnable);
+        evolutionThread.start();
+    }
+
     private JComboBox<String> createRepresentationSelect() {
-        String[] representations = {"Ellipse", "Voronoi", "Line", "Simple Triangles", "Triangles"}; // TODO: fix order
+        String[] representations = {"Triangles", "Ellipses", "Voronoi"};
+        //String[] representations = {"Ellipse", "Voronoi", "Line", "Triangles", "Triangles (complex)"}; // includes bad algorithms
         JComboBox<String> representationSelect = new JComboBox<>(representations);
         representationSelect.setBounds(10, 10, 140, 20);
         return  representationSelect;
@@ -135,33 +163,6 @@ public class GUI {
         createdImageLabel.setBounds(20 + originalImageLabel.getWidth(), 100,
                 createdImage.getWidth(), createdImage.getHeight());
         createdImageLabel.setIcon(new ImageIcon(createdImage));
-    }
-
-    private void runEvolution() {
-        BufferedImage image = getCurrentImage();
-        String algorithmName = (String) representationSelect.getSelectedItem();
-        assert algorithmName != null;
-        if (evolutionThread != null && evolutionThread.isAlive()) {
-            currentEvolution.running = false;
-        }
-        Evolution evolution;
-        if (algorithmName.equals("Simple Triangles")) {
-            evolution = new SimpleTriangleEvolution(image, this, null, 10_000, 100);
-        } else if (algorithmName.equals("Triangles")) {
-            evolution = new TriangleEvolution(image, this, 100_000, 10_000, 10);
-        } else if (algorithmName.equals("Voronoi")) {
-            evolution = new VoronoiEvolution(image, this, 1_000_000, 10_000, 100);
-        } else if (algorithmName.equals("Line")) {
-            evolution = new LineEvolution(image, this, 1_000_000, 1_000_000, 10);
-        } else if (algorithmName.equals("Ellipse")) {
-            evolution = new EllipseEvolution(image, this, 1_000_000, 10_000, 30);
-        } else {
-            return;
-        }
-        Runnable runnable = evolution::evolve;
-        currentEvolution = evolution;
-        evolutionThread = new Thread(runnable);
-        evolutionThread.start();
     }
 
     public static void main(String[] args) {

@@ -11,8 +11,6 @@ import java.util.List;
 
 public class TriangleEvolution extends Evolution {
 
-    // TODO: something broken (population/instances changes when loss worse)
-
     private static int populationSize = 1;
     private static int triangleCount = 50;
     private static int childCount = 1;
@@ -33,9 +31,8 @@ public class TriangleEvolution extends Evolution {
     }
 
     @Override
-    protected void displayTop() {
-        TriangleImage top = chooseFittest(1, population).get(0);
-        gui.setCreatedImage(top.toImage());
+    protected ImageRepresentation getTop() {
+        return chooseFittest(1, population).get(0);
     }
 
     protected void nextGeneration() {
@@ -96,7 +93,7 @@ public class TriangleEvolution extends Evolution {
             y[i] = random.nextInt(originalImage.getHeight());
         }
         Color color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256),
-                random.nextInt(256));
+                random.nextInt(226) + 30);
         return new Triangle(x, y, color);
     }
 }

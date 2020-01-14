@@ -10,11 +10,14 @@ import java.util.List;
 
 public class SimpleTriangleEvolution extends BinaryEvolution<TriangleImage> {
 
-    private static int triangle_count = 50;
-    private static int maxChanges = 3;
-    private static double colorChangeProb = 0.5;
-    private static double maxMoveRatio = 0.3;
-    private static int maxColorChange = 10;
+    private static int triangle_count = 100;
+
+    private static int maxChanges = 2;
+    private static double colorChangeProb = 0.3;
+    private static double oneVertexChangeProb = 0.3;
+    private static double anotherVertexChangeProb = 0.2;
+    private static double maxMoveRatio = 0.2;
+    private static int maxColorChange = 30;
 
     private int maxMoveX;
     private int maxMoveY;
@@ -36,19 +39,31 @@ public class SimpleTriangleEvolution extends BinaryEvolution<TriangleImage> {
 
     @Override
     protected void mutate(TriangleImage image) {
-        int changes = random.nextInt(maxChanges) + 1;
-        for (int i = 0; i < changes; i++) {
+        int nChanges = random.nextInt(maxChanges) + 1;
+        for (int i = 0; i < nChanges; i++) {
             Triangle triangle = image.getTriangles().get(random.nextInt(triangle_count));
-            if (random.nextDouble() < colorChangeProb) {
-                triangle.setColor(mutateColor(triangle.getColor(), maxColorChange, true, true));
-            } else {
-                mutateVertex(triangle);
+            boolean changeColor = random.nextDouble() < colorChangeProb;
+            boolean changeOneVertex = !changeColor || random.nextDouble() < oneVertexChangeProb;
+            boolean changeAnotherVertex = changeOneVertex && random.nextDouble() < anotherVertexChangeProb;
+            if (changeColor) {
+                triangle.setColor(mutateColor(triangle.getColor(), maxColorChange, true, false));
+            }
+            List<Integer> changePos = new ArrayList<>();
+            if (changeOneVertex && !changeAnotherVertex) {
+                changePos.add(random.nextInt(3));
+            } else if (changeAnotherVertex) {
+                changePos.add(0);
+                changePos.add(1);
+                changePos.add(2);
+                changePos.remove(random.nextInt(3));
+            }
+            for (Integer pos : changePos) {
+                mutateVertex(triangle, pos);
             }
         }
     }
 
-    private void mutateVertex(Triangle triangle) {
-        int pos = random.nextInt(3);
+    private void mutateVertex(Triangle triangle, int pos) {
         triangle.getX()[pos] = bound(triangle.getX()[pos] + doubleRand(maxMoveX), 0, originalImage.getWidth());
         triangle.getY()[pos] = bound(triangle.getY()[pos] + doubleRand(maxMoveY), 0, originalImage.getHeight());
     }
@@ -61,7 +76,7 @@ public class SimpleTriangleEvolution extends BinaryEvolution<TriangleImage> {
             y[i] = random.nextInt(originalImage.getHeight());
         }
         Color color = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256),
-                random.nextInt(256));
+                random.nextInt(226) + 30);
         return new Triangle(x, y, color);
     }
 }

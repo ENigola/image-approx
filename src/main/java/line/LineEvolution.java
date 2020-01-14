@@ -2,7 +2,6 @@ package line;
 
 import core.BinaryEvolution;
 import core.GUI;
-import line.LineImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
